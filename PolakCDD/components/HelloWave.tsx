@@ -1,31 +1,40 @@
-import React from 'react';
-import {View, Text, Image, ScrollView, TextInput} from 'react-native';
+import { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withRepeat,
+  withSequence,
+} from 'react-native-reanimated';
+
+import { ThemedText } from '@/components/ThemedText';
 
 export function HelloWave() {
-  return (
-    <ScrollView>
-      <Text>Some text</Text>
-      <View>
-        <Text>Some more text</Text>
-        <Image
-          source={{
-            uri: 'https://reactnative.dev/docs/assets/p_cat2.png',
-          }}
-          style={{width: 200, height: 200}}
-        />
-      </View>
-      <TextInput
-        style={{
-          height: 80,
-          borderColor: 'gray',
-          borderWidth: 1,
-          fontSize: 80
-          
-        }}
-        defaultValue="You can type in me"
-      />
-    </ScrollView>
-  );
-};
+  const rotationAnimation = useSharedValue(0);
 
-export default HelloWave;
+  useEffect(() => {
+    rotationAnimation.value = withRepeat(
+      withSequence(withTiming(25, { duration: 150 }), withTiming(0, { duration: 150 })),
+      4 // Run the animation 4 times
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotationAnimation.value}deg` }],
+  }));
+
+  return (
+    <Animated.View style={animatedStyle}>
+      <ThemedText style={styles.text}>👋</ThemedText>
+    </Animated.View>
+  );
+}
+
+const styles = StyleSheet.create({
+  text: {
+    fontSize: 28,
+    lineHeight: 32,
+    marginTop: -6,
+  },
+});
